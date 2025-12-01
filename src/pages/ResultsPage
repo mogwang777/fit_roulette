@@ -1,0 +1,107 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "../App.css";
+
+function ResultsPage() {
+  const navigate = useNavigate();
+  const [uploadedFiles, setUploadedFiles] = useState({ tops: [], bottoms: [] });
+  const [topIndex, setTopIndex] = useState(0);
+  const [bottomIndex, setBottomIndex] = useState(0);
+  const [selected, setSelected] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const storedName = localStorage.getItem("userName");
+    if (storedName) setUserName(storedName);
+
+    const storedFiles = JSON.parse(localStorage.getItem("uploadedFiles"));
+    if (storedFiles) setUploadedFiles(storedFiles);
+  }, []);
+
+  const tops = uploadedFiles.tops || [];
+  const bottoms = uploadedFiles.bottoms || [];
+
+  // ✅ Handle next/previous for tops
+  const nextTop = () => {
+    if (tops.length > 0)
+      setTopIndex((prev) => (prev + 1) % tops.length);
+    setSelected(false);
+  };
+
+  const prevTop = () => {
+    if (tops.length > 0)
+      setTopIndex((prev) => (prev === 0 ? tops.length - 1 : prev - 1));
+    setSelected(false);
+  };
+
+  // ✅ Handle next/previous for bottoms
+  const nextBottom = () => {
+    if (bottoms.length > 0)
+      setBottomIndex((prev) => (prev + 1) % bottoms.length);
+    setSelected(false);
+  };
+
+  const prevBottom = () => {
+    if (bottoms.length > 0)
+      setBottomIndex((prev) => (prev === 0 ? bottoms.length - 1 : prev - 1));
+    setSelected(false);
+  };
+
+  const select = () => setSelected(true);
+
+  if (tops.length === 0 || bottoms.length === 0) {
+    return <p>No outfits uploaded. Go back and upload some!</p>;
+  }
+
+  return (
+    <div className="results-container">
+      <h1>Here are your outfit options, {userName}! 👕👖</h1>
+      <div className={`outfit-display ${selected ? "magnify" : ""}`}>
+        <div>
+          <p><strong>Top:</strong></p>
+          <img src={tops[topIndex]} alt="Top" width="150" />
+          <div className="button-container">
+            <button style={{ margin: "5px" }} onClick={prevTop}>Previous Top</button>
+            <button style={{ margin: "5px" }} onClick={nextTop}>Next Top</button>
+          </div>
+        </div>
+
+        <div>
+          <p><strong>Bottom:</strong></p>
+          <img src={bottoms[bottomIndex]} alt="Bottom" width="150" />
+          <div className="button-container">
+            <button style={{ margin: "5px" }} onClick={prevBottom}>Previous Bottom</button>
+            <button style={{ margin: "5px" }} onClick={nextBottom}>Next Bottom</button>
+          </div>
+
+          <p>
+            <strong>Pro-tip:</strong> Accessorize this outfit to make it more <i>you</i>. 🌺
+          </p>
+        </div>
+
+        {selected && (
+          <p className="congrats">
+            🎉 Congratulations on selecting an outfit! 🎉
+          </p>
+        )}
+      </div>
+
+      <div className="button-container">
+        <button
+          style={{
+            margin: "10px",
+            color: "white",
+            backgroundColor: "mediumseagreen",
+          }}
+          onClick={select}
+        >
+          Select
+        </button>
+      </div>
+
+      <button onClick={() => navigate("/")}>Back to Home</button>
+    </div>
+  );
+}
+
+export default ResultsPage;
